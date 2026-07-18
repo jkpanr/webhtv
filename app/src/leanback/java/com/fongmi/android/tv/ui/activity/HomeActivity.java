@@ -185,16 +185,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 if (mPresenter.isDelete()) setHistoryDelete(false);
             }
         });
-        mBinding.typeRecycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
-            @Override
-            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (child != null && parent.hasFocus()) updateToolbarVisibility(true);
-            }
-        });
     }
 
     private void updateToolbarVisibility(boolean visible) {
-        mBinding.toolbar.setVisibility(visible && webToolbarVisible ? View.VISIBLE : View.GONE);
+//        mBinding.toolbar.setVisibility(visible && webToolbarVisible ? View.VISIBLE : View.GONE);
+        mBinding.toolbar.setVisibility(webToolbarVisible ? View.VISIBLE : View.GONE);
         syncNativeContentInset();
         syncWebOverlayLayout();
     }
@@ -228,8 +223,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private boolean isTopRow(int position) {
-        int history = mAdapter.indexOf(R.string.home_history);
-        return history == -1 || position < history;
+        return position < getRecommendIndex();
+//        int recommend = mAdapter.indexOf(R.string.home_recommend);
+//        return recommend == -1 || position < recommend;
+//        int history = mAdapter.indexOf(R.string.home_history);
+//        return history == -1 || position < history;
     }
 
     private void checkAction(Intent intent) {
@@ -309,7 +307,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void setAdapter() {
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
         mAdapter.add(new ListRow(mFuncAdapter = new ArrayObjectAdapter(new FuncPresenter(this))));
-        mAdapter.add(R.string.home_history);
+//        mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
     }
 
@@ -449,15 +447,21 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void addGrid(List<Vod> items, Style style) {
-        List<ListRow> rows = new ArrayList<>();
-        VodPresenter presenter = new VodPresenter(this, style);
-        for (List<Vod> part : Lists.partition(items, Product.getColumn(style))) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
-            adapter.addAll(0, part);
-            rows.add(new ListRow(adapter));
-        }
-        mAdapter.addAll(mAdapter.size(), rows);
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, style));
+        adapter.addAll(0, items);
+        mAdapter.add(new ListRow(adapter));
     }
+
+//    private void addGrid(List<Vod> items, Style style) {
+//        List<ListRow> rows = new ArrayList<>();
+//        VodPresenter presenter = new VodPresenter(this, style);
+//        for (List<Vod> part : Lists.partition(items, Product.getColumn(style))) {
+//            ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+//            adapter.addAll(0, part);
+//            rows.add(new ListRow(adapter));
+//        }
+//        mAdapter.addAll(mAdapter.size(), rows);
+//    }
 
     private void setFunc() {
         List<Func> items = new ArrayList<>();
@@ -474,6 +478,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void getHistory(boolean renew) {
+        if (true || false) return;
         List<History> items = History.get();
         int historyIndex = getHistoryIndex();
         int recommendIndex = getRecommendIndex();
@@ -501,6 +506,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private int getRecommendIndex() {
+//        return 1;
         return mAdapter.indexOf(R.string.home_recommend) + 1;
     }
 
@@ -704,10 +710,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             if (mWeb.dispatchKeyEvent(event)) return true;
             return super.dispatchKeyEvent(event);
         }
-        if (KeyUtil.isActionDown(event) & KeyUtil.isUpKey(event) && mBinding.typeRecycler.hasFocus()) return requestTitleFocus();
-        if (KeyUtil.isActionDown(event) & KeyUtil.isDownKey(event) && mBinding.typeRecycler.hasFocus()) return requestContentFocus();
-        if (KeyUtil.isActionDown(event) & KeyUtil.isUpKey(event) && mBinding.recycler.hasFocus() && mBinding.typeRecycler.getVisibility() == View.VISIBLE) updateToolbarVisibility(true);
-        if (KeyUtil.isActionDown(event) & KeyUtil.isDownKey(event) && getCurrentFocus() == mBinding.title) return requestHomeFocus();
+        if (KeyUtil.isActionDown(event) && KeyUtil.isUpKey(event) && mBinding.typeRecycler.hasFocus()) return requestContentFocus() || requestTitleFocus();
+        if (KeyUtil.isActionDown(event) && KeyUtil.isDownKey(event) && mBinding.typeRecycler.hasFocus()) return true;
+        if (KeyUtil.isActionDown(event) && KeyUtil.isDownKey(event) && getCurrentFocus() == mBinding.title) return requestHomeFocus();
         return super.dispatchKeyEvent(event);
     }
 
@@ -718,8 +723,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private boolean requestHomeFocus() {
+        if (requestContentFocus()) return true;
         if (mBinding.typeRecycler.getVisibility() == View.VISIBLE) return mBinding.typeRecycler.requestFocus();
-        return requestContentFocus();
+        return false;
     }
 
     private boolean requestWebFocus() {

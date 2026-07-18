@@ -12,23 +12,6 @@
         android:orientation="vertical"
         android:paddingTop="80dp">
 
-        <androidx.leanback.widget.HorizontalGridView
-            android:id="@+id/typeRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:nextFocusUp="@id/title"
-            android:nextFocusDown="@id/recycler"
-            android:paddingStart="24dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="8dp"
-            android:visibility="gone"
-            app:focusOutEnd="false"
-            app:focusOutFront="false"
-            tools:visibility="visible" />
-
         <com.fongmi.android.tv.ui.custom.ProgressLayout
             android:id="@+id/progressLayout"
             android:layout_width="match_parent"
@@ -41,7 +24,8 @@
                 android:layout_height="match_parent"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:nextFocusUp="@id/typeRecycler"
+                android:nextFocusUp="@id/title"
+                android:nextFocusDown="@id/typeRecycler"
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
@@ -50,6 +34,23 @@
                 app:focusOutFront="true" />
 
         </com.fongmi.android.tv.ui.custom.ProgressLayout>
+
+        <androidx.leanback.widget.HorizontalGridView
+            android:id="@+id/typeRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:nextFocusUp="@id/recycler"
+            android:nextFocusDown="@id/typeRecycler"
+            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            android:visibility="gone"
+            app:focusOutEnd="false"
+            app:focusOutFront="false"
+            tools:visibility="visible" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <FrameLayout
@@ -87,7 +88,7 @@
             android:layout_weight="1"
             android:ellipsize="marquee"
             android:focusable="false"
-            android:nextFocusDown="@id/typeRecycler"
+            android:nextFocusDown="@id/recycler"
             android:singleLine="true"
             android:text="@string/app_name"
             android:textColor="@color/white"
